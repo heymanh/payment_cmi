@@ -7,6 +7,10 @@
             <field name="provider">cmi</field>
             <field name="company_id" ref="base.main_company"/>
             <field name="view_template_id" ref="cmi_form"/>
+            <field name="environment">test</field>
+            <field name="cmi_merchant_id">dummy_merchant_id</field>
+            <field name="cmi_merchant_key">dummy_merchant_key</field>
+            <field name="cmi_url_gateway">dummy_url_gateway</field>
             <field name="payment_icon_ids" eval='[(6, 0, [ref("payment_cmi.payment_icon_cc_visacard"),
                                                         ref("payment_cmi.payment_icon_cc_maestrocard"),
                                                         ref("payment_cmi.payment_icon_cc_mastercard"),
