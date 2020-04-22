@@ -114,8 +114,8 @@ class PaymentAcquirerCmi(models.Model):
 
     def cmi_get_form_action_url(self):
         self.ensure_one()
-        environment = 'prod' if self.state == 'enabled' else 'test'
-        return self._get_cmi_urls(environment)['cmi_form_url']
+        # environment = 'prod' if self.state == 'enabled' else 'test'
+        return self._get_cmi_urls('')['cmi_form_url']
 
 
 class PaymentTransactionCmi(models.Model):
