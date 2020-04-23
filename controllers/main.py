@@ -7,6 +7,7 @@ import werkzeug
 
 from odoo import http
 from odoo.http import request
+from odoo.addons.payment.models.payment_acquirer import ValidationError
 
 _logger = logging.getLogger(__name__)
 
@@ -22,7 +23,6 @@ class CmiController(http.Controller):
         return werkzeug.utils.redirect('/payment/process')
 
     @http.route(['/payment/cmi/callback'], auth='public', csrf=False)
-
     def feedback(self, **post):
         cmi_tx_confirmation = request.env['payment.transaction'].sudo()._get_cmi_tx_confirmation(post)
         try:
