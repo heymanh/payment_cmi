@@ -14,7 +14,7 @@ class CmiController(http.Controller):
     def cmi_return(self, **post):
         """ CMI."""
         _logger.info(
-            'CMI: entering form_feedback with post data %s', pprint.pformat(post))
+            'CMI: entering cmi_return with post data %s', pprint.pformat(post))
         if post:
             request.env['payment.transaction'].sudo().form_feedback(post, 'cmi')
         return werkzeug.utils.redirect('/payment/process')
@@ -22,6 +22,8 @@ class CmiController(http.Controller):
     @http.route(['/payment/cmi/callback'], auth='public', csrf=False)
     def feedback(self, **post):
         cmi_tx_confirmation = request.env['payment.transaction'].sudo()._get_cmi_tx_confirmation(post)
+        _logger.info(
+            'CMI: entering feedback with post data %s', pprint.pformat(post))
         try:
             request.env['payment.transaction'].sudo().form_feedback(post, 'cmi')
         except Exception:
