@@ -4,13 +4,10 @@
 import logging
 import pprint
 import werkzeug
-
 from odoo import http
 from odoo.http import request
-from odoo.addons.payment.models.payment_acquirer import ValidationError
 
 _logger = logging.getLogger(__name__)
-
 
 class CmiController(http.Controller):
     @http.route(['/payment/cmi/return', '/payment/cmi/cancel', '/payment/cmi/error'], type='http', auth='public', csrf=False)
@@ -27,7 +24,8 @@ class CmiController(http.Controller):
         cmi_tx_confirmation = request.env['payment.transaction'].sudo()._get_cmi_tx_confirmation(post)
         try:
             request.env['payment.transaction'].sudo().form_feedback(post, 'cmi')
-        except ValidationError:
+        except Exception:
+            _logger.exception('Error on /payment/cmi/callback')
             return 'FAILURE'
             # return 'APPROVED'
         if cmi_tx_confirmation == True:
