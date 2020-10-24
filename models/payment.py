@@ -96,25 +96,25 @@ class PaymentAcquirerCmi(models.Model):
                           lang=lang,
                           refreshtime='5',
                           encoding='UTF-8',
-                          BillToName=re.sub(r'[^a-zA-Z0-9 ]+', '', values.get('billing_partner_name')).strip()
+                          BillToName=re.sub(r'[^a-zA-Z0-9 ]+', '', str(values.get('billing_partner_name'))).strip()
                           if 'billing_partner_name' in values else None,
                           email=values.get(
                               'billing_partner_email').strip() if 'billing_partner_email' in values else '',
-                          tel=re.sub(r'[^0-9 -]+', ' ', values.get(
-                              'billing_partner_phone')).strip() if 'billing_partner_phone' in values else '',
-                          BillToStreet1=re.sub(r'[^a-zA-Z0-9 ]+', ' ', values.get(
-                              'billing_partner_address')).strip() if 'billing_partner_address' in values else '',
-                          BillToCity=re.sub(r'[^a-zA-Z0-9 ]+', '', values.get(
-                              'billing_partner_city')).strip() if 'billing_partner_city' in values else '',
-                          BillToPostalCode=re.sub(r'[^a-zA-Z0-9 ]+', '', values.get(
-                              'billing_partner_zip')).strip() if 'billing_partner_zip' in values else '',
+                          tel=re.sub(r'[^0-9 -]+', ' ', str(values.get(
+                              'billing_partner_phone'))).strip() if 'billing_partner_phone' in values else '',
+                          BillToStreet1=re.sub(r'[^a-zA-Z0-9 ]+', ' ', str(values.get(
+                              'billing_partner_address'))).strip() if 'billing_partner_address' in values else '',
+                          BillToCity=re.sub(r'[^a-zA-Z0-9 ]+', '', str(values.get(
+                              'billing_partner_city'))).strip() if 'billing_partner_city' in values else '',
+                          BillToPostalCode=re.sub(r'[^a-zA-Z0-9 ]+', '', str(values.get(
+                              'billing_partner_zip'))).strip() if 'billing_partner_zip' in values else '',
                           BillToCompany=re.sub(r'[^a-zA-Z0-9 ]+', '',
-                                               values.get(
-                                                   'billing_partner_commercial_company_name')).strip() if 'billing_partner_commercial_company_name' in values else '',
+                                               str(values.get(
+                                                   'billing_partner_commercial_company_name'))).strip() if 'billing_partner_commercial_company_name' in values else '',
                           BillToCountry=re.sub(r'[^a-zA-Z0-9 ]+', '',
-                                               values.get(
-                                                   'billing_partner_country').name).strip() if 'billing_partner_country' in values else '',
-                          BillToStateProv=re.sub(r'[^a-zA-Z0-9 ]+', '', billing_state).strip(),
+                                               str(values.get(
+                                                   'billing_partner_country').name)).strip() if 'billing_partner_country' in values else '',
+                          BillToStateProv=re.sub(r'[^a-zA-Z0-9 ]+', '', str(billing_state)).strip(),
                           shopurl=base_url,
                           failUrl=urls.url_join(base_url, '/payment/cmi/error').strip(),
                           okUrl=urls.url_join(base_url, '/payment/cmi/return').strip(),
