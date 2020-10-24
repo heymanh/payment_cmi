@@ -6,9 +6,12 @@ import re
 
 from werkzeug import urls
 
+from odoo.http import request
+
 from odoo import api, fields, models, _
 from odoo.addons.payment.models.payment_acquirer import ValidationError
 from odoo.tools.float_utils import float_compare
+from odoo.addons.payment_cmi.controllers.main import CmiController
 
 import logging
 import base64
@@ -54,7 +57,7 @@ class PaymentAcquirerCmi(models.Model):
         else:
             keys = sorted(values, key=str.casefold)
             keys = [e for e in keys if e not in ('encoding', 'HASH')]
-            sign = ''.join('%s|' % (str(values.get(k)).replace("|", "\\|").replace("\\", "\\\\")) for k in keys)
+            sign = ''.join('%s|' % (str(values.get(k)).replace("|", "\\|").replace("\\", "\\\\").replace("\n", "")) for k in keys)
             sign += self.cmi_merchant_key.replace("|", "\\|").replace("\\", "\\\\") or ''
             shasign = base64.b64encode(hashlib.sha512(sign.encode('utf-8')).digest())
 
@@ -75,7 +78,7 @@ class PaymentAcquirerCmi(models.Model):
             lang = enLang
         # cmi_tx_confirmation=PaymentTransactionCmi._get_cmi_tx_confirmation(self)
         # _logger.info('CMI: cmi_tx_confirmation 2 %s', cmi_tx_confirmation)
-        _logger.info('CMI payment post values: %s', values)
+
         billing_state = values['billing_partner_state'].name if values.get('billing_partner_state') else ''
         if values.get('billing_partner_country') and values.get('billing_partner_country') == self.env.ref('base.us',
                                                                                                            False):
@@ -109,7 +112,7 @@ class PaymentAcquirerCmi(models.Model):
                           callbackUrl=urls.url_join(base_url, '/payment/cmi/callback').strip()
                           )
 
-        cmi_values['hash'] = self._cmi_generate_sign('in', cmi_values)
+        cmi_values['hash'] = self._cmi_generate_sign('in', cmi_values).decode("utf-8")
         return cmi_values
 
     def cmi_get_form_action_url(self):
@@ -168,13 +171,16 @@ class PaymentTransactionCmi(models.Model):
 
     def _cmi_form_validate(self, data):
         status = data.get('ProcReturnCode')
-        result = self.write({
-            'acquirer_reference': data.get('oid'),
-            'date': fields.Datetime.now(),
-        })
+        tx = data.get('oid') and request.env['payment.transaction'].sudo().search(
+            [('reference', 'in', [data.get('oid')])], limit=1)
         if status == '00':
+            self.write({'acquirer_reference': data.get('oid')})
             self._set_transaction_done()
-        elif status != '00':
-            self._set_transaction_cancel()
+            _logger.info('tx.state main %s', tx.state)  # debug
+            return True
         else:
-            self._set_transac
+            error = _('Cmi: feedback error')
+            _logger.info(error)
+            self.write({'state_message': error})
+            self._set_transaction_cancel()
+            return False
