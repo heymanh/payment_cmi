@@ -124,6 +124,14 @@ class PaymentAcquirerCmi(models.Model):
 class PaymentTransactionCmi(models.Model):
     _inherit = 'payment.transaction'
 
+    cmi_tx_confirmation = fields.Selection([
+        ('default', 'Par défaut'),
+        ('ACTION=POSTAUTH', 'ACTION=POSTAUTH'),
+        ('APPROVED', 'APPROVED')
+    ], string='cmi_tx_confirmation_mode', default='default',
+        help="Si default alors utilisation du cmi_tx_confirmation porté par payment.acquirer," +
+             "\nsinon celui porté par le payment.transaction")
+
     @api.model
     def _cmi_form_get_tx_from_data(self, data):
         """ Given a data dict coming from cmi, verify it and find the related
@@ -167,7 +175,11 @@ class PaymentTransactionCmi(models.Model):
     def _get_cmi_tx_confirmation(self, data):
         reference = data.get('oid')
         transaction = self.search([('reference', '=', reference)])
-        return transaction.acquirer_id.cmi_tx_confirmation
+
+        if transaction.cmi_tx_confirmation == 'default':
+            return transaction.acquirer_id.cmi_tx_confirmation
+        else:
+            return transaction.cmi_tx_confirmation == 'ACTION=POSTAUTH'
 
     def _cmi_form_validate(self, data):
         status = data.get('ProcReturnCode')
