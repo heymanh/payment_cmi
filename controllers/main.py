@@ -4,7 +4,7 @@
 import logging
 import pprint
 import werkzeug
-from odoo import http, _
+from odoo import http
 from odoo.http import request
 
 _logger = logging.getLogger(__name__)
@@ -45,7 +45,6 @@ class CmiController(http.Controller):
 
     @http.route(['/payment/cmi/callback'], type='http', auth='public', csrf=False)
     def feedback(self, **post):
-        _logger.info(_("Call to /payment/cmi/callback with params: %s")%(pprint.pformat(post)))
         if not post:
             _logger.info('CMI: received empty notification; skip.')
         else:
